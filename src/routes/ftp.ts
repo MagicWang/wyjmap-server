@@ -4,7 +4,7 @@ const ftp = require("basic-ftp");
 const config = require('../config.json');
 var fs = require('file-system');
 import * as path from 'path';
-var streams = require('memory-streams');
+var streamBuffers = require('stream-buffers');
 
 const ftpRouter: Router = Router();
 ftpRouter.get(/^\/download\/(\S+)$/, async (request: Request, response: Response) => {
@@ -45,9 +45,10 @@ async function download(filename) {
     host: config.serverConfig.ftpUrl
   });
   await client.cd('upload');
-  var writer = new streams.WritableStream();
-  await client.download(writer, filename);
+  var writableStreamBuffer = new streamBuffers.WritableStreamBuffer();
+  await client.download(writableStreamBuffer, filename);
   client.close();
-  return writer.toBuffer();
+  writableStreamBuffer.end();
+  return writableStreamBuffer.getContents();
 }
 export { ftpRouter };
