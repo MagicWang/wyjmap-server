@@ -26,13 +26,18 @@ ftpRouter.post("/upload", multer({ dest: 'uploads/' }).any(), async (request: Re
     response.json({ code: -1, data: error, message: '' });
   }
 });
+ftpRouter.post("/delete", async (request: Request, response: Response) => {
+  var filename = request.query && request.query.filename;
+  try {
+    await remove(filename);
+    response.json({ code: 0, data: true, message: '删除成功' });
+  } catch (error) {
+    response.json({ code: -1, data: false, message: '删除失败' });
+  }
+});
 async function upload(file) {
+  const client = await access();
   var ext = path.extname(file.originalname);
-  const client = new ftp.Client();
-  await client.access({
-    host: config.serverConfig.ftpUrl
-  });
-  await client.cd('upload');
   var filename = file.filename + ext;
   await client.upload(fs.createReadStream(file.path), filename);
   client.close();
@@ -40,15 +45,24 @@ async function upload(file) {
   return filename;
 }
 async function download(filename) {
-  const client = new ftp.Client();
-  await client.access({
-    host: config.serverConfig.ftpUrl
-  });
-  await client.cd('upload');
+  const client = await access();
   var writableStreamBuffer = new streamBuffers.WritableStreamBuffer();
   await client.download(writableStreamBuffer, filename);
   client.close();
   writableStreamBuffer.end();
   return writableStreamBuffer.getContents();
+}
+async function remove(filename) {
+  const client = await access();
+  await client.remove(filename);
+  client.close();
+}
+async function access() {
+  const client = new ftp.Client();
+  await client.access({
+    host: config.serverConfig.ftpUrl
+  });
+  await client.cd('upload');
+  return client;
 }
 export { ftpRouter };
