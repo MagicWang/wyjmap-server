@@ -1,0 +1,18 @@
+{
+    "serverConfig": {
+        "port": 4300,
+        "weatherUrl": "https://ditu.amap.com/service/weather",
+        "tilesDir": "../tiles",
+        "tilesCacheDir": "../tiles",
+        "ftpUrl": "wyjmap.com"
+    },
+    "pgConfig": {
+        "user": "postgres",
+        "password": "netposa",
+        "database": "gaode",
+        "host": "localhost",
+        "port": 5432,
+        "max": 50,
+        "idleTimeoutMillis": 3000
+    }
+}
