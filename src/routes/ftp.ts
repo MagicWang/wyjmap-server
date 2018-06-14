@@ -26,7 +26,7 @@ ftpRouter.post("/upload", multer({ dest: 'uploads/' }).any(), async (request: Re
     response.json({ code: -1, data: error, message: '' });
   }
 });
-ftpRouter.post("/delete", async (request: Request, response: Response) => {
+ftpRouter.delete("/delete", async (request: Request, response: Response) => {
   var filename = request.query && request.query.filename;
   try {
     await remove(filename);
