@@ -8,14 +8,14 @@ placeRouter.get("/text", (request: Request, response: Response) => {
   var pageSize = parseInt(request.query.pageSize);
   var pageIndex = parseInt(request.query.pageIndex);
   if (!keyword || isNaN(pageSize) || isNaN(pageIndex)) {
-    response.end({ code: 10002 });
+    response.end({ code: -2 });
     return;
   }
   var offset = (pageIndex - 1) * pageSize;
   DbUtils.instance.executeSql("select count(*) from poi WHERE name like $1", ['%' + keyword + '%']).then(result => {
     var count = parseInt(result.rows[0].count) || 0;
     DbUtils.instance.executeSql("select * from poi WHERE name like $1 limit $2 offset $3", ['%' + keyword + '%', pageSize, offset]).then(result => {
-      response.json({ code: 200, count: count, pageSize: pageSize, pageIndex: pageIndex, data: result.rows });
+      response.json({ code: 0, count: count, pageSize: pageSize, pageIndex: pageIndex, data: result.rows });
     });
   });
 });

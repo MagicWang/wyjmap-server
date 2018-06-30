@@ -22,7 +22,7 @@ districtRouter.get("/provincelist", (request: Request, response: Response) => {
           }
         }
       }
-      response.json({ code: 200, data: provinces });
+      response.json({ code: 0, data: provinces });
     });
   });
 });
@@ -34,13 +34,13 @@ districtRouter.get("/citylist", (request: Request, response: Response) => {
       var city = cities[j];
       city.name = city.name.replace('市', '').replace('地区', '');
     }
-    response.json({ code: 200, data: cities });
+    response.json({ code: 0, data: cities });
   });
 });
 //根据中心点与级别获取城市，访问地址：http://localhost:4300/district/queryCityByCenter?center=113,22&level={level}
 districtRouter.get("/queryCityByCenter", (request: Request, response: Response) => {
   if (!request.query || !request.query.center) {
-    response.json({ code: 500, data: null });
+    response.json({ code: -2, data: null });
   } else {
     DbUtils.instance.executeSql("SELECT id,citycode,adcode,pcode,name,center,level from district where st_contains(geom,st_geometryfromtext($1,4326))", ["point(" + request.query.center.replace(/,/g, ' ') + ")"]).then(result => {
       var data = {};
@@ -58,7 +58,7 @@ districtRouter.get("/queryCityByCenter", (request: Request, response: Response) 
       } else if (request.query.level === 'district') {
         city = data['district'] || data['city'] || data['province'] || data['country'];
       }
-      response.json({ code: 200, data: city || { adcode: '', name: '未知区域' } });
+      response.json({ code: 0, data: city || { adcode: '', name: '未知区域' } });
     });
   }
 });
@@ -74,9 +74,9 @@ districtRouter.get("/weather", (req: Request, res: Response) => {
   var url = config.serverConfig.weatherUrl + "?" + query;
   request(url, (error, response, body) => {
     if (error) {
-      res.json({ code: 500, data: null });
+      res.json({ code: -1, data: null });
     } else {
-      res.json({ code: 200, data: JSON.parse(body) });
+      res.json({ code: 0, data: JSON.parse(body) });
     }
   });
 });
