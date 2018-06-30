@@ -15,7 +15,15 @@ placeRouter.get("/text", (request: Request, response: Response) => {
   DbUtils.instance.executeSql("select count(*) from poi WHERE name like $1", ['%' + keyword + '%']).then(result => {
     var count = parseInt(result.rows[0].count) || 0;
     DbUtils.instance.executeSql("select * from poi WHERE name like $1 limit $2 offset $3", ['%' + keyword + '%', pageSize, offset]).then(result => {
-      response.json({ code: 0, count: count, pageSize: pageSize, pageIndex: pageIndex, data: result.rows });
+      response.json({
+        code: 0,
+        data: {
+          content: result.rows,
+          total: count,
+          pageSize: pageSize,
+          pageIndex: pageIndex
+        }
+      });
     });
   });
 });
